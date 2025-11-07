@@ -5,6 +5,8 @@ import { useState } from 'react';
 export default function CertificateViewer({ certificate }) {
   const [copied, setCopied] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const certificateUrl = certificate.certificateUrl || certificate.certificateImageUrl;
+  const certificateFileType = certificate.certificateFileType || 'application/pdf';
 
   const handleCopy = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -16,8 +18,11 @@ export default function CertificateViewer({ certificate }) {
     try {
       setDownloaded(true);
       const link = document.createElement('a');
-      link.href = certificate.certificateImageUrl;
-      link.download = `${certificate.studentName}-certificate.png`;
+      link.href = certificateUrl;
+      const extension = certificateFileType === 'application/pdf'
+        ? 'pdf'
+        : certificateFileType?.split('/')?.pop() || 'certificate';
+      link.download = `${certificate.studentName}-certificate.${extension}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -57,15 +62,29 @@ export default function CertificateViewer({ certificate }) {
 
         {/* Main Content Container */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Certificate Image - Left/Top */}
+          {/* Certificate Preview - Left/Top */}
           <div className="lg:col-span-2">
             <div className="bg-slate-800 rounded-lg border border-slate-700 overflow-hidden shadow-2xl">
               <div className="relative">
-                <img
-                  src={certificate.certificateImageUrl}
-                  alt={`${certificate.studentName}'s Certificate`}
-                  className="w-full h-auto object-cover"
-                />
+                {certificateFileType === 'application/pdf' ? (
+                  <object
+                    data={`${certificateUrl}#toolbar=0`}
+                    type="application/pdf"
+                    className="w-full h-[600px]"
+                  >
+                    <iframe
+                      src={`${certificateUrl}#toolbar=0`}
+                      title="Certificate Preview"
+                      className="w-full h-[600px]"
+                    />
+                  </object>
+                ) : (
+                  <img
+                    src={certificateUrl}
+                    alt={`${certificate.studentName}'s Certificate`}
+                    className="w-full h-auto object-cover"
+                  />
+                )}
               </div>
             </div>
 
