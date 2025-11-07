@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://upgradtask-backend.onrender.com/api';
+const API_BASE_URL = 'https://upgradtask-backend.vercel.app/api';
 
 export async function fetchStats() {
   const response = await fetch(`${API_BASE_URL}/admin/stats`);
